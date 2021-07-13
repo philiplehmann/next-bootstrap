@@ -1,0 +1,12 @@
+export declare class AccountMinAggregate {
+    id: string | null;
+    userId: string | null;
+    providerType: string | null;
+    providerId: string | null;
+    providerAccountId: string | null;
+    refreshToken: string | null;
+    accessToken: string | null;
+    accessTokenExpires: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+}
