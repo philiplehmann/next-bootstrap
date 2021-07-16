@@ -1,0 +1,3 @@
+nextjs: yarn next dev
+postgres: postgres
+elastic: elasticsearch -E "xpack.security.enabled=false" -E "discovery.type=single-node"

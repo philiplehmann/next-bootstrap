@@ -2,9 +2,17 @@
   "env": {
     "development": {
       "presets": [
-        "next/babel"
+        [
+          "next/babel",
+          {
+            "class-properties": {
+              "loose": true
+            }
+          }
+        ]
       ],
       "plugins": [
+        "babel-plugin-transform-typescript-metadata",
         [
           "@babel/plugin-proposal-decorators",
           {
@@ -15,9 +23,17 @@
     },
     "production": {
       "presets": [
-        "next/babel"
+        [
+          "next/babel",
+          {
+            "class-properties": {
+              "loose": true
+            }
+          }
+        ]
       ],
       "plugins": [
+        "babel-plugin-transform-typescript-metadata",
         [
           "@babel/plugin-proposal-decorators",
           {

@@ -1,10 +1,23 @@
+import 'reflect-metadata'
 import React, { FC } from 'react'
-import { Provider } from 'next-auth/client'
+import { Provider as NextAuthProvider } from 'next-auth/client'
+import { CacheProvider } from '@emotion/react'
+import { ThemeProvider } from '@material-ui/core/styles'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import createCache from '@emotion/cache'
+import theme from 'src/theme'
+
+import { apolloClient } from 'src/config'
+import { ApolloProvider } from '@apollo/client'
+
 import type { AppProps } from 'next/app'
+
+const cache = createCache({ key: 'css', prepend: true })
+cache.compat = true
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
-    <Provider
+    <NextAuthProvider
       // Provider options are not required but can be useful in situations where
       // you have a short session maxAge time. Shown here with default values.
       options={{
@@ -24,8 +37,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       }}
       session={pageProps.session}
     >
-      <Component {...pageProps} />
-    </Provider>
+      <CacheProvider value={cache}>
+        <ApolloProvider client={apolloClient}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </ApolloProvider>
+      </CacheProvider>
+    </NextAuthProvider>
   )
 }
 export default App

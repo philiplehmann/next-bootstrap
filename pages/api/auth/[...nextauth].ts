@@ -7,7 +7,10 @@ import getConfig from 'next/config'
 import type { NextApiRequest } from 'next'
 
 const {
-  serverRuntimeConfig: { baseUrl }
+  serverRuntimeConfig: {
+    baseUrl,
+    pages: { newUserUrl } // signInUrl, signOutUrl,
+  }
 } = getConfig()
 
 export default NextAuth({
@@ -19,7 +22,7 @@ export default NextAuth({
       // You can specify whatever fields you are expecting to be submitted.
       // e.g. domain, username, password, 2FA token, etc.
       credentials: {
-        username: { label: 'Username', type: 'text' }, // placeholder: "jsmith" },
+        email: { label: 'E-Mail', type: 'email' }, // placeholder: "jsmith" },
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials, _req: NextApiRequest) {
@@ -29,7 +32,6 @@ export default NextAuth({
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
-        console.log(credentials)
         try {
           const res = await fetch(`${baseUrl}/api/user/login`, {
             method: 'POST',
@@ -43,6 +45,7 @@ export default NextAuth({
             return user
           }
         } catch (error) {
+          // eslint-disable-next-line
           console.error(error)
 
           // Return null if user data could not be retrieved
@@ -141,11 +144,11 @@ export default NextAuth({
   // pages is not specified for that route.
   // https://next-auth.js.org/configuration/pages
   pages: {
-    // signIn: '/auth/signin',  // Displays signin buttons
-    // signOut: '/auth/signout', // Displays form with sign out button
+    // signIn: signInUrl, // Displays signin buttons
+    // signOut: signOutUrl, // Displays form with sign out button
     // error: '/auth/error', // Error code passed in query string as ?error=
     // verifyRequest: '/auth/verify-request', // Used for check email page
-    // newUser: null // If set, new users will be directed here on first sign in
+    newUser: newUserUrl // If set, new users will be directed here on first sign in
   },
 
   // Callbacks are asynchronous functions you can use to control what happens

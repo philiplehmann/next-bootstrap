@@ -35,6 +35,7 @@ export default async (
         `password does not match: ${req.body.email}`
       )
   } catch (error) {
+    // eslint-disable-next-line
     console.error(error)
     return res.status(404).end()
   }

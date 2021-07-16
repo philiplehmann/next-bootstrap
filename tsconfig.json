@@ -19,13 +19,13 @@
     "baseUrl": "./", /* Base directory to resolve non-absolute module names. */
     "paths": {
       "components/*": [
-        "./components/*"
+        "./src/components/*"
       ],
       "helpers/*": [
-        "./helpers/*"
+        "src/helpers/*"
       ],
       "config/*": [
-        "./config/*"
+        "src/config/*"
       ],
       "generated/*": [
         "./prisma/generated/*"
