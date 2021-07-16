@@ -3,6 +3,7 @@ import Providers from 'next-auth/providers'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { prisma } from 'config/prisma'
 import getConfig from 'next/config'
+import { logger } from 'helpers/logger'
 
 import type { NextApiRequest } from 'next'
 
@@ -38,6 +39,7 @@ export default NextAuth({
             body: JSON.stringify(credentials),
             headers: { 'Content-Type': 'application/json' }
           })
+          if (!res.ok) throw new Error('response not successful')
           const user = await res.json()
 
           // If no error and we have user data, return it
@@ -45,8 +47,7 @@ export default NextAuth({
             return user
           }
         } catch (error) {
-          // eslint-disable-next-line
-          console.error(error)
+          logger.error(error.message)
 
           // Return null if user data could not be retrieved
           return null

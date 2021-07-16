@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { logger } from 'helpers/logger'
 
 export type QueryEvent = {
   timestamp: Date
@@ -35,23 +36,18 @@ export const prisma = new PrismaClient({
   ]
 })
 prisma.$on('query', (event: QueryEvent) => {
-  // eslint-disable-next-line
-  console.info(`Query: ${event.query}`)
-  // eslint-disable-next-line
-  console.info(`Duration: ${event.duration}ms`)
+  logger.info(`Query: ${event.query}`)
+  logger.info(`Duration: ${event.duration}ms`)
 })
 
 prisma.$on('warn', (event: LogEvent) => {
-  // eslint-disable-next-line
-  console.warn(event)
+  logger.warn(event)
 })
 
 prisma.$on('info', (event: LogEvent) => {
-  // eslint-disable-next-line
-  console.info(event)
+  logger.info(event)
 })
 
 prisma.$on('error', (event: LogEvent) => {
-  // eslint-disable-next-line
-  console.error(event)
+  logger.error(event)
 })

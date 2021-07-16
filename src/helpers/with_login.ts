@@ -1,5 +1,5 @@
 import { getSession } from 'next-auth/client'
-import { User } from 'generated/typegraphql-prisma'
+import { User } from 'generated/typegraphql-prisma/models/User'
 import getConfig from 'next/config'
 
 import type {

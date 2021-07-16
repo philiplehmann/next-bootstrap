@@ -8,9 +8,9 @@ datasource db {
 }
 
 generator typegraphql {
-  provider           = "typegraphql-prisma"
-  output             = "./generated/typegraphql-prisma"
-  emitTranspiledCode = true
+  provider = "typegraphql-prisma"
+  output   = "./generated/typegraphql-prisma"
+  // emitTranspiledCode = true
 }
 
 model Account {

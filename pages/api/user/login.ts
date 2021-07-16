@@ -2,6 +2,7 @@ import { runCors } from 'config/middleware/cors'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from 'config/prisma'
 import bcrypt from 'bcrypt'
+import { logger } from 'helpers/logger'
 
 export class UserNotFoundError extends Error {}
 export class NoPasswordAvailableError extends Error {}
@@ -36,7 +37,7 @@ export default async (
       )
   } catch (error) {
     // eslint-disable-next-line
-    console.error(error)
+    logger.error(error.message)
     return res.status(404).end()
   }
 
