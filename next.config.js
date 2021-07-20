@@ -10,6 +10,7 @@ const sharedConfig = {
   baseUrl: process.env.BASE_URL || 'http://localhost:5000',
   defaultLocale: process.env.DEFAULT_LOCALE || 'en'
 }
+const isDevelopment = sharedConfig.env === 'development'
 
 module.exports = withPWA({
   reactStrictMode: true,
@@ -18,9 +19,10 @@ module.exports = withPWA({
     ...sharedConfig,
     rollbarServerToken: process.env.ROLLBAR_SERVER_TOKEN,
     cors: {
-      // methods: ['GET', 'HEAD'],
-      origin: sharedConfig.baseUrl,
-      optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+      methods: ['GET', 'HEAD', 'POST', 'PATCH', 'PUT', 'DELETE'],
+      origin: isDevelopment ? '*' : sharedConfig.baseUrl,
+      optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+      credentials: true // needed if session is passed via cookies
     },
     pages: {
       signInUrl: '/api/auth/signin',
@@ -52,7 +54,14 @@ module.exports = withPWA({
     config.resolve.alias.components = path.resolve(__dirname, 'src/components')
     config.resolve.alias.helpers = path.resolve(__dirname, 'src/helpers')
     config.resolve.alias.config = path.resolve(__dirname, 'src/config')
+    config.resolve.alias.queries = path.resolve(__dirname, 'src/queries')
     config.resolve.alias.generated = path.resolve(__dirname, 'prisma/generated')
+    config.module.rules.push({
+      test: /\.(graphql|gql)$/,
+      exclude: /node_modules/,
+      loader: 'graphql-tag/loader'
+    })
+    config.resolve.extensions.push('.graphql')
 
     // Important: return the modified config
     return config

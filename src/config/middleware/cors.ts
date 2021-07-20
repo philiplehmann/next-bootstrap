@@ -11,6 +11,9 @@ const {
 // Initializing the cors middleware
 const corsHandler = Cors(corsConfig)
 
-export const runCors = (req: NextApiRequest, res: NextApiResponse) => {
-  return runMiddleware(req, res, corsHandler)
+export const runCors = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<any> => {
+  return await runMiddleware(req, res, corsHandler)
 }

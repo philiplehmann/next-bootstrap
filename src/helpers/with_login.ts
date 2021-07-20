@@ -1,13 +1,18 @@
 import { getSession } from 'next-auth/client'
-import { User } from 'generated/typegraphql-prisma/models/User'
+import type { Session } from 'next-auth'
+import jwt from 'next-auth/jwt'
+
 import getConfig from 'next/config'
 
+// import type { User } from 'generated/typegraphql-prisma/models/User'
 import type {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
-  GetServerSideProps
+  GetServerSideProps,
+  NextApiRequest
 } from 'next'
 import type { ParsedUrlQuery } from 'querystring'
+import { logger } from './logger'
 
 const {
   serverRuntimeConfig: {
@@ -15,15 +20,14 @@ const {
   }
 } = getConfig()
 
-export class NoSessionUserError extends Error {
+export class NoTokenError extends Error {
   constructor() {
-    super('no user in session')
+    super('no jwt token')
   }
 }
-
-export class UserNotFoundError extends Error {
+export class NoSessionError extends Error {
   constructor() {
-    super('user not found in db')
+    super('no user in session')
   }
 }
 
@@ -31,9 +35,10 @@ export type GetServerSidePropsWithLogin = <
   P extends { [key: string]: any } = { [key: string]: any },
   Q extends ParsedUrlQuery = ParsedUrlQuery
 >(
-  callback: (
-    content: GetServerSidePropsContext<Q>,
-    user: User
+  callback?: (
+    context: GetServerSidePropsContext<Q>,
+    session: Session | null,
+    token: string | null
   ) => Promise<GetServerSidePropsResult<P>>
 ) => GetServerSideProps<P, Q>
 
@@ -46,18 +51,33 @@ export type GetServerSidePropsWithLoginResult = <
 
 export const withLogin: GetServerSidePropsWithLogin =
   (callback) => async (context) => {
-    const session = await getSession(context)
-    if (session?.user?.email === undefined || session?.user?.email === null) {
-      const { res } = context
-      res.writeHead(301, {
-        Location: signInUrl
-      })
-      res.end()
-      // end function, request is handeld
-      throw new NoSessionUserError()
-    }
+    try {
+      const token =
+        (await jwt.getToken({
+          req: context.req as NextApiRequest,
+          raw: true
+        })) || null
+      if (!token) throw new NoTokenError()
 
-    const user = new User()
-    user.email = session.user.email // TODO: check user in db if (user === null) throw new UserNotFoundError()
-    return await callback(context, user)
+      const session = await getSession(context)
+      if (!session?.user) throw new NoSessionError()
+
+      let output: GetServerSidePropsResult<any> = { props: {} }
+      if (typeof callback === 'function') {
+        output = await callback(context, session, token)
+      }
+      if ('props' in output) {
+        return { ...output, props: { ...output.props, session, token } }
+      }
+      return output
+    } catch (error) {
+      logger.error(error)
+
+      return {
+        redirect: {
+          destination: signInUrl,
+          permanent: false
+        }
+      }
+    }
   }

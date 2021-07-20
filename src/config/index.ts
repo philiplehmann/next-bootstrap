@@ -1,2 +1,2 @@
-export { default as apolloClient } from './apollo-client'
+export { createApolloClient } from './apollo_client'
 // export { elasticsearch } from './elasticsearch'

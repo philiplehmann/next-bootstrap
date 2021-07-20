@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import React, { FC } from 'react'
+import React, { FC, useMemo } from 'react'
 import { Provider as NextAuthProvider } from 'next-auth/client'
 import { CacheProvider } from '@emotion/react'
 import { ThemeProvider } from '@material-ui/core/styles'
@@ -7,7 +7,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import createCache from '@emotion/cache'
 import theme from 'src/theme'
 
-import { apolloClient } from 'src/config'
+import { createApolloClient } from 'src/config'
 import { ApolloProvider } from '@apollo/client'
 
 import type { AppProps } from 'next/app'
@@ -16,6 +16,10 @@ const cache = createCache({ key: 'css', prepend: true })
 cache.compat = true
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
+  const { token, session } = pageProps
+  const apolloClient = useMemo(() => {
+    return createApolloClient(token)
+  }, [token])
   return (
     <NextAuthProvider
       // Provider options are not required but can be useful in situations where
@@ -35,7 +39,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         // windows / tabs will be updated to reflect the user is signed out.
         keepAlive: 0
       }}
-      session={pageProps.session}
+      session={{ ...session, token }}
     >
       <CacheProvider value={cache}>
         <ApolloProvider client={apolloClient}>

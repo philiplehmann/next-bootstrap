@@ -1,34 +1,12 @@
-import { getSession } from 'next-auth/client'
-import { prisma } from 'config/prisma'
-import { User } from 'generated/typegraphql-prisma'
-import type { NextApiRequest } from 'next'
+import { useSession } from 'next-auth/client'
+import { useQuery } from '@apollo/client'
+import userByEmail from 'queries/user_by_email.graphql'
+import type { ApolloError } from '@apollo/client'
 
-type CurrentUserOptions = { req: NextApiRequest }
-
-export class NoSessionUserError extends Error {
-  constructor() {
-    super('no user in session')
-  }
-}
-
-export class UserNotFoundError extends Error {
-  constructor() {
-    super('user not found in db')
-  }
-}
-
-export const getCurrentUser = async ({
-  req
-}: CurrentUserOptions): Promise<User> => {
-  const session = await getSession({ req })
-  if (session?.user?.email === undefined || session?.user?.email === null) {
-    throw new NoSessionUserError()
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email }
+export const useCurrentUser = (): [ApolloError | undefined, any, boolean] => {
+  const [session, sessionLoading] = useSession()
+  const { loading, error, data } = useQuery(userByEmail, {
+    variables: { email: session?.user?.email }
   })
-  if (user === null) throw new UserNotFoundError()
-
-  return user
+  return [error, data, sessionLoading || loading]
 }

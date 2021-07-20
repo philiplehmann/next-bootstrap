@@ -1,0 +1,5 @@
+tunnels:
+  graphql:
+    proto: http
+    addr: 5000
+    subdomain: next-bootstrap

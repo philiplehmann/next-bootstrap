@@ -9,7 +9,7 @@ export type ScrollTopProps = {
 
 export const ScrollTopButton: FC = () => {
   return (
-    <Fab color="secondary" size="small" aria-label="scroll back to top">
+    <Fab color="primary" size="small" aria-label="scroll back to top">
       <KeyboardArrowUpIcon />
     </Fab>
   )

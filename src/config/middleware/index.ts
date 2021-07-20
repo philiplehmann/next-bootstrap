@@ -1,0 +1,1 @@
+export { runCors } from './cors'

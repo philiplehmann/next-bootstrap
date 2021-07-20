@@ -1,0 +1,14 @@
+query Query($email: String!) {
+  findFirstUser(where: { 
+      email: {
+        equals: $email
+      }
+    }) {
+    id
+    email
+    name
+    image
+    createdAt
+    updatedAt
+  }
+}

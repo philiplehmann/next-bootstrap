@@ -8,9 +8,13 @@ datasource db {
 }
 
 generator typegraphql {
-  provider = "typegraphql-prisma"
-  output   = "./generated/typegraphql-prisma"
-  // emitTranspiledCode = true
+  provider           = "typegraphql-prisma"
+  output             = "./generated/typegraphql-prisma"
+  emitTranspiledCode = true
+}
+
+enum Role {
+  ADMIN
 }
 
 model Account {
@@ -53,6 +57,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  roles         Json      @default("[]") @db.JsonB
 }
 
 model VerificationRequest {
