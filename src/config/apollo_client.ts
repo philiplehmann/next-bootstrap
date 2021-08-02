@@ -1,22 +1,14 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink,
-  NormalizedCacheObject
-} from '@apollo/client'
+import { ApolloClient, InMemoryCache, createHttpLink, NormalizedCacheObject } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import getConfig from 'next/config'
 
-const {
-  serverRuntimeConfig: { baseUrl }
-} = getConfig()
-
-export const createApolloClient = (
-  token: string | undefined
-): ApolloClient<NormalizedCacheObject> => {
+export const createApolloClient = (token?: string): ApolloClient<NormalizedCacheObject> => {
+  const {
+    serverRuntimeConfig: { graphqlServer: graphqlServerBackend },
+    publicRuntimeConfig: { graphqlServer: graphqlServerPublic }
+  } = getConfig()
   const httpLink = createHttpLink({
-    uri:
-      typeof window === undefined ? `${baseUrl}/api/graphql` : '/api/graphql',
+    uri: typeof window === undefined ? graphqlServerBackend : graphqlServerPublic,
     credentials: 'include' // 'same-origin', 'include'
   })
   const authLink = setContext((_, { headers }) => {

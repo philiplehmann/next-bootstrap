@@ -8,9 +8,9 @@ datasource db {
 }
 
 generator typegraphql {
-  provider           = "typegraphql-prisma"
-  output             = "./generated/typegraphql-prisma"
-  emitTranspiledCode = true
+  provider = "typegraphql-prisma"
+  output   = "./generated/typegraphql-prisma"
+  // emitTranspiledCode = true
 }
 
 enum Role {
@@ -50,6 +50,7 @@ model User {
   lastName      String?   @db.VarChar(255)
   name          String?   @db.VarChar(255)
   email         String?   @unique @db.VarChar(255)
+  /// @TypeGraphQL.omit(output: true)
   password      String?   @db.VarChar(255)
   emailVerified DateTime?
   image         String?   @db.Text

@@ -1,4 +1,4 @@
-query Query($email: String!) {
+query UserByEmail($email: String!) {
   findFirstUser(where: { 
       email: {
         equals: $email

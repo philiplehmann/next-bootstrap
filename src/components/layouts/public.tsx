@@ -1,259 +1,144 @@
-import React, { useState, FC, ReactNode, SyntheticEvent } from 'react'
-import { styled, alpha } from '@material-ui/core/styles'
+import React, { memo, useState, useMemo, useCallback, FC, ReactNode } from 'react'
 import {
   AppBar,
   Container,
   Box,
   Toolbar,
   IconButton,
-  Typography,
-  InputBase,
-  Badge,
-  MenuItem,
-  Menu
+  Link,
+  Drawer,
+  Button,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText
 } from '@material-ui/core'
 import {
   Menu as MenuIcon,
-  Search as SearchIcon,
-  AccountCircle as AccountCircleIcon,
-  Mail as MailIcon,
-  Notifications as NotificationsIcon,
-  More as MoreIcon
+  Dashboard as DashboardIcon,
+  Construction as ConstructionIcon,
+  Create as CreateIcon
 } from '@material-ui/icons'
-import ScrollTop, { ScrollTopButton } from 'components/scroll_top'
+import { useCurrentUser } from 'helpers/current_user'
+import NextLink from 'next/link'
+import { UserProfileMenu, RotateIcon, ScrollTop, ScrollTopButton } from 'components'
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25)
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto'
-  }
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-}))
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch'
-    }
-  }
-}))
-
-type PublicLayoutProps = {
+interface PublicLayoutProps {
   children: ReactNode
 }
 
-const PublicLayout: FC<PublicLayoutProps> = ({ children }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    useState<HTMLElement | null>(null)
+const PublicLayout: FC<PublicLayoutProps> = memo(({ children }) => {
+  const [_error, user, loading] = useCurrentUser()
+  const [mobileDrawer, setMobileDrawer] = useState<boolean>(false)
 
-  const isMenuOpen = Boolean(anchorEl)
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
+  const toggleMobileDrawerHandler = useCallback(() => {
+    setMobileDrawer((state) => !state)
+  }, [setMobileDrawer])
 
-  const handleProfileMenuOpen = (event: SyntheticEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-    handleMobileMenuClose()
-  }
-
-  const handleMobileMenuOpen = (event: SyntheticEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget)
-  }
-
-  const menuId = 'primary-search-account-menu'
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  )
-
-  const mobileMenuId = 'primary-search-account-menu-mobile'
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 11 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircleIcon />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  )
+  const menuEntries = useMemo(() => {
+    return [
+      { path: '/test1', title: 'Test 1', icon: DashboardIcon },
+      { path: '/test2', title: 'Test 2', icon: ConstructionIcon },
+      { path: '/test3', title: 'Test 3', icon: CreateIcon }
+    ]
+  }, [])
 
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
+        <AppBar position="fixed">
           <Toolbar id="back-to-top-anchor">
             <IconButton
+              onClick={toggleMobileDrawerHandler}
               size="large"
               edge="start"
               color="inherit"
               aria-label="open drawer"
-              sx={{ mr: 2 }}
+              sx={{ display: { xs: 'block', sm: 'none' }, mr: 2 }}
             >
               <MenuIcon />
             </IconButton>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: 'none', sm: 'block' } }}
-            >
-              Material-UI
-            </Typography>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </Search>
-            <Box sx={{ flexGrow: 1 }} />
-            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <IconButton
-                size="large"
-                aria-label="show 4 new mails"
-                color="inherit"
-              >
-                <Badge badgeContent={4} color="secondary">
-                  <MailIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size="large"
-                aria-label="show 17 new notifications"
-                color="inherit"
-              >
-                <Badge badgeContent={17} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size="large"
-                edge="end"
-                aria-label="account of current user"
-                aria-controls={menuId}
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                <AccountCircleIcon />
-              </IconButton>
+
+            <Box justifyContent="center" sx={{ flexGrow: 1 }}>
+              {menuEntries.map(({ path, title, icon: Icon }) => {
+                return (
+                  <NextLink href={path} passHref key={title}>
+                    <Button
+                      color="inherit"
+                      variant="text"
+                      startIcon={<Icon />}
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}
+                    >
+                      {title}
+                    </Button>
+                  </NextLink>
+                )
+              })}
             </Box>
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size="large"
-                aria-label="show more"
-                aria-controls={mobileMenuId}
-                aria-haspopup="true"
-                onClick={handleMobileMenuOpen}
-                color="inherit"
-              >
-                <MoreIcon />
-              </IconButton>
+
+            <Box justifyContent="flex-end">{loading && <RotateIcon />}</Box>
+            <Box justifyContent="flex-end">
+              {user ? (
+                <UserProfileMenu />
+              ) : (
+                <>
+                  <NextLink href="/auth/signin" passHref>
+                    <Link color="inherit">Sign In</Link>
+                  </NextLink>
+                  &nbsp;/&nbsp;
+                  <NextLink href="/auth/signup" passHref>
+                    <Link color="inherit">Sign Up</Link>
+                  </NextLink>
+                </>
+              )}
             </Box>
           </Toolbar>
         </AppBar>
-        {renderMobileMenu}
-        {renderMenu}
       </Box>
-      <Container>
-        <Box sx={{ my: 2 }}></Box>
+      <Container
+        sx={{
+          marginTop: {
+            xs: '56px',
+            md: '64px'
+          },
+          paddingTop: (theme) => theme.spacing(2),
+          height: {
+            xs: 'calc(100vh - 56px)',
+            md: 'calc(100vh - 64px)'
+          }
+        }}
+      >
         {children}
       </Container>
       <ScrollTop>
         <ScrollTopButton />
       </ScrollTop>
+      <Drawer anchor="left" open={mobileDrawer} onClose={toggleMobileDrawerHandler}>
+        <Box
+          role="presentation"
+          onClick={toggleMobileDrawerHandler}
+          onKeyDown={toggleMobileDrawerHandler}
+          sx={{ width: '100vw' }}
+        >
+          <List>
+            {menuEntries.map(({ path, title, icon: Icon }) => {
+              return (
+                <NextLink href={path} passHref key={title}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <Icon />
+                    </ListItemIcon>
+                    <ListItemText primary={title} />
+                  </ListItemButton>
+                </NextLink>
+              )
+            })}
+          </List>
+        </Box>
+      </Drawer>
     </>
   )
-}
+})
+PublicLayout.displayName = 'PublicLayout'
 
 export default PublicLayout

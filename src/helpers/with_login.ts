@@ -1,24 +1,23 @@
 import { getSession } from 'next-auth/client'
-import type { Session } from 'next-auth'
 import jwt from 'next-auth/jwt'
-
 import getConfig from 'next/config'
-
-// import type { User } from 'generated/typegraphql-prisma/models/User'
-import type {
-  GetServerSidePropsContext,
-  GetServerSidePropsResult,
-  GetServerSideProps,
-  NextApiRequest
-} from 'next'
-import type { ParsedUrlQuery } from 'querystring'
 import { logger } from './logger'
+
+import type { AppProps } from 'next/app'
+import type { Session } from 'next-auth'
+import type { GetServerSidePropsContext, GetServerSidePropsResult, GetServerSideProps, NextApiRequest } from 'next'
+import type { ParsedUrlQuery } from 'querystring'
 
 const {
   serverRuntimeConfig: {
     pages: { signInUrl }
   }
 } = getConfig()
+
+export type AppWithLoginProps = AppProps & {
+  session: Session
+  token: string
+}
 
 export class NoTokenError extends Error {
   constructor() {
@@ -49,35 +48,57 @@ export type GetServerSidePropsWithLoginResult = <
   context: GetServerSidePropsContext<Q2>
 ) => Promise<GetServerSidePropsResult<P2>>
 
-export const withLogin: GetServerSidePropsWithLogin =
-  (callback) => async (context) => {
-    try {
-      const token =
-        (await jwt.getToken({
-          req: context.req as NextApiRequest,
-          raw: true
-        })) || null
-      if (!token) throw new NoTokenError()
+export const withLogin: GetServerSidePropsWithLogin = (callback) => async (context) => {
+  try {
+    const token =
+      (await jwt.getToken({
+        req: context.req as NextApiRequest,
+        raw: true
+      })) || null
+    if (!token) throw new NoTokenError()
 
-      const session = await getSession(context)
-      if (!session?.user) throw new NoSessionError()
+    const session = await getSession(context)
+    if (!session?.user) throw new NoSessionError()
 
-      let output: GetServerSidePropsResult<any> = { props: {} }
-      if (typeof callback === 'function') {
-        output = await callback(context, session, token)
-      }
-      if ('props' in output) {
-        return { ...output, props: { ...output.props, session, token } }
-      }
-      return output
-    } catch (error) {
-      logger.error(error)
+    let output: GetServerSidePropsResult<any> = { props: {} }
+    if (typeof callback === 'function') {
+      output = await callback(context, session, token)
+    }
+    if ('props' in output) {
+      return { ...output, props: { ...output.props, session, token } }
+    }
+    return output
+  } catch (error) {
+    logger.error(error)
 
-      return {
-        redirect: {
-          destination: signInUrl,
-          permanent: false
-        }
+    return {
+      redirect: {
+        destination: signInUrl,
+        permanent: false
       }
     }
   }
+}
+
+export const passSession: GetServerSidePropsWithLogin = (callback) => async (context) => {
+  let output: GetServerSidePropsResult<any> = { props: {} }
+  try {
+    const token =
+      (await jwt.getToken({
+        req: context.req as NextApiRequest,
+        raw: true
+      })) || null
+
+    const session = await getSession(context)
+
+    if (typeof callback === 'function') {
+      output = await callback(context, session, token)
+    }
+    if ('props' in output) {
+      return { ...output, props: { ...output.props, session, token } }
+    }
+  } catch (error) {
+    logger.error(error)
+  }
+  return output
+}

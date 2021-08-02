@@ -4,13 +4,16 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { prisma } from 'config/prisma'
 import getConfig from 'next/config'
 import { logger } from 'helpers/logger'
+import { createApolloClient } from 'config/apollo_client'
+import SignIn from 'queries/sign_in.graphql'
 
 import type { NextApiRequest } from 'next'
 
+const apolloClient = createApolloClient()
+
 const {
   serverRuntimeConfig: {
-    baseUrl,
-    pages: { newUserUrl } // signInUrl, signOutUrl,
+    pages: { signInUrl, newUserUrl }
   }
 } = getConfig()
 
@@ -34,18 +37,10 @@ export default NextAuth({
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
         try {
-          const res = await fetch(`${baseUrl}/api/user/login`, {
-            method: 'POST',
-            body: JSON.stringify(credentials),
-            headers: { 'Content-Type': 'application/json' }
-          })
-          if (!res.ok) throw new Error('response not successful')
-          const user = await res.json()
+          const res = await apolloClient.query({ query: SignIn, variables: credentials })
+          if (!res?.data?.signinUser) throw new Error('user not found')
 
-          // If no error and we have user data, return it
-          if (res.ok && user) {
-            return user
-          }
+          return res.data.signinUser
         } catch (error) {
           logger.error(error)
 
@@ -167,7 +162,7 @@ export default NextAuth({
   // pages is not specified for that route.
   // https://next-auth.js.org/configuration/pages
   pages: {
-    // signIn: signInUrl, // Displays signin buttons
+    signIn: signInUrl, // Displays signin buttons
     // signOut: signOutUrl, // Displays form with sign out button
     // error: '/auth/error', // Error code passed in query string as ?error=
     // verifyRequest: '/auth/verify-request', // Used for check email page
@@ -190,8 +185,8 @@ export default NextAuth({
 
   // You can set the theme to 'light', 'dark' or use 'auto' to default to the
   // whatever prefers-color-scheme is set to in the browser. Default is 'auto'
-  theme: 'light',
+  theme: 'auto',
 
   // Enable debug messages in the console if you are having problems
-  debug: false
+  debug: true
 })

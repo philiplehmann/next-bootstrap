@@ -1,10 +1,13 @@
 import React, { FC } from 'react'
-// import Head from 'next/head'
-// import Image from 'next/image'
 import { PublicLayout } from 'components/layouts'
-import type { AppProps } from 'next/app'
+import { passSession } from 'helpers/with_login'
 
-const Home: FC<AppProps> = () => {
+import type { AppWithLoginProps } from 'helpers/with_login'
+import type { GetServerSideProps } from 'next'
+
+export const getServerSideProps: GetServerSideProps = passSession()
+
+const Home: FC<AppWithLoginProps> = () => {
   return (
     <PublicLayout>
       {[...new Array(50)]

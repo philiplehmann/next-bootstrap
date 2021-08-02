@@ -2,9 +2,7 @@ import colors from 'colors/safe'
 
 const checkError = (args: any[]): any[] => {
   const first = args.shift()
-  args.unshift(
-    first instanceof Error ? `${first.message}\n${first.stack}` : first
-  )
+  args.unshift(first instanceof Error ? `${first.message}\n${first.stack}` : first)
   return args
 }
 
