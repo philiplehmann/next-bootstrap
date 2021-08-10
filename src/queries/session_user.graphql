@@ -1,0 +1,10 @@
+query Session {
+  currentUser {
+    id
+    email
+    name
+    image
+    createdAt
+    updatedAt
+  }
+}

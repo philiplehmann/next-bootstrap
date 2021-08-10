@@ -1,12 +1,13 @@
 import { prisma } from 'config/prisma'
 import { logger } from 'helpers/logger'
 import jwt from 'next-auth/jwt'
+import config from 'config'
 
 import type { ContextFunction } from 'apollo-server-core'
 import type { Request } from 'express'
 import type { User } from 'generated/typegraphql-prisma'
 
-const secret = process.env.NEXTAUTH_SECRET || ''
+const secret = config.nextAuthSecret
 
 const apolloServerContext: ContextFunction<{ req: Request }> = async ({ req }) => {
   // Note: This example uses the `req` argument to access headers,

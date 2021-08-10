@@ -1,6 +1,6 @@
 import { useSession } from 'next-auth/client'
 import { useQuery } from '@apollo/client'
-import userByEmail from 'queries/user_by_email.graphql'
+import SessionUser from 'queries/session_user.graphql'
 import type { ApolloError } from '@apollo/client'
 
 export interface CurrentUser {
@@ -12,13 +12,13 @@ export interface CurrentUser {
   updatedAt: string
 }
 
-interface CurrentUserData {
-  findFirstUser: CurrentUser
+interface SessionData {
+  currentUser: CurrentUser
 }
 export const useCurrentUser = (): [ApolloError | undefined, CurrentUser | undefined, boolean] => {
   const [session, sessionLoading] = useSession()
-  const { loading, error, data } = useQuery<CurrentUserData>(userByEmail, {
+  const { loading, error, data } = useQuery<SessionData>(SessionUser, {
     variables: { email: session?.user?.email }
   })
-  return [error, data && data.findFirstUser, sessionLoading || loading]
+  return [error, data && data.currentUser, sessionLoading || loading]
 }

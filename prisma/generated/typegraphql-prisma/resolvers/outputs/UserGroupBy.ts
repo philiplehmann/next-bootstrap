@@ -38,6 +38,11 @@ export class UserGroupBy {
   @TypeGraphQL.Field(_type => String, {
     nullable: true
   })
+  emailVerificationToken!: string | null;
+
+  @TypeGraphQL.Field(_type => String, {
+    nullable: true
+  })
   password!: string | null;
 
   @TypeGraphQL.Field(_type => Date, {

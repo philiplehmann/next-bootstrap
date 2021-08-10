@@ -1,4 +1,5 @@
 import { Client } from '@elastic/elasticsearch'
+import config from 'config'
 export const elasticsearch = new Client({
-  node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200'
+  node: config.elasticsearchUrl
 })

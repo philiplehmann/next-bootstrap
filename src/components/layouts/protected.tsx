@@ -22,11 +22,60 @@ import { RotateIcon, UserProfileMenu, ScrollTop, ScrollTopButton } from 'compone
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
+import type SvgIcon from '@material-ui/core/SvgIcon'
+
 const drawerWidth = 240
+const smallDrawerWidth = 56
 
 interface ProtectedLayoutProps {
   children: ReactNode
   title: string
+}
+
+interface MenuEntry {
+  path: string
+  title: string
+  icon: typeof SvgIcon
+}
+
+interface ProtectedDrawerProps {
+  menuEntries: MenuEntry[]
+}
+
+const ProtectedDrawer: FC<ProtectedDrawerProps> = ({ menuEntries }) => {
+  return (
+    <>
+      <List>
+        {menuEntries.map(({ path, title, icon: Icon }) => {
+          return (
+            <NextLink href={path} key={title} passHref>
+              <ListItem button>
+                <ListItemIcon>
+                  <Icon />
+                </ListItemIcon>
+                <ListItemText primary={title} />
+              </ListItem>
+            </NextLink>
+          )
+        })}
+      </List>
+      <Divider />
+      <List>
+        {menuEntries.map(({ path, title, icon: Icon }) => {
+          return (
+            <NextLink href={path} key={title} passHref>
+              <ListItem button>
+                <ListItemIcon>
+                  <Icon />
+                </ListItemIcon>
+                <ListItemText primary={title} />
+              </ListItem>
+            </NextLink>
+          )
+        })}
+      </List>
+    </>
+  )
 }
 
 const ProtectedLayout: FC<ProtectedLayoutProps> = ({ children, title }) => {
@@ -52,49 +101,51 @@ const ProtectedLayout: FC<ProtectedLayoutProps> = ({ children, title }) => {
     ]
   }, [])
 
-  const drawer = (
-    <div>
-      <Toolbar />
-      <Divider />
-      <List>
-        {menuEntries.map(({ path, title, icon: Icon }) => {
-          return (
-            <NextLink href={path} key={title} passHref>
-              <ListItem button>
-                <ListItemIcon>
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText primary={title} />
-              </ListItem>
-            </NextLink>
-          )
-        })}
-      </List>
-      <Divider />
-      <List>
-        {menuEntries.map(({ path, title, icon: Icon }) => {
-          return (
-            <NextLink href={path} key={title} passHref>
-              <ListItem button>
-                <ListItemIcon>
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText primary={title} />
-              </ListItem>
-            </NextLink>
-          )
-        })}
-      </List>
-    </div>
-  )
-
   return (
     <Box sx={{ display: 'flex' }}>
+      <Box component="nav" sx={{ width: { sm: smallDrawerWidth, md: drawerWidth }, flexShrink: { sm: 0 } }}>
+        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+        <Drawer
+          container={typeof window === 'undefined' ? null : document.body}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: { sm: smallDrawerWidth, md: drawerWidth }
+            }
+          }}
+        >
+          <ProtectedDrawer menuEntries={menuEntries} />
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          elevation={0}
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              overflowX: 'hidden',
+              width: { sm: smallDrawerWidth, md: drawerWidth }
+            }
+          }}
+          open
+        >
+          <Toolbar />
+          <ProtectedDrawer menuEntries={menuEntries} />
+        </Drawer>
+      </Box>
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` }
+          zIndex: 1200,
+          width: { sm: `100%` },
+          paddingLeft: { sm: `${smallDrawerWidth}px`, md: `${drawerWidth}px` }
         }}
       >
         <Toolbar>
@@ -116,40 +167,7 @@ const ProtectedLayout: FC<ProtectedLayoutProps> = ({ children, title }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Drawer
-          container={typeof window === 'undefined' ? null : document.body}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth
-            }
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth
-            }
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
+
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar id="back-to-top-anchor" />
         {children}
