@@ -6,6 +6,7 @@ import { User } from 'generated/typegraphql-prisma/models'
 import { getPrismaFromContext } from 'generated/typegraphql-prisma/helpers'
 import { NoUserError, SignInError } from './errors'
 import { SignInUserArgs } from './args'
+import { queryLogger } from './helpers'
 
 import type { PrismaClient } from '@prisma/client'
 
@@ -14,6 +15,7 @@ export class SignInResolver {
   @Query((_returns) => User, {
     nullable: false
   })
+  @queryLogger()
   async signinUser(@Ctx() ctx: any, @Info() _info: GraphQLResolveInfo, @Args() args: SignInUserArgs): Promise<User> {
     const {
       data: { password, email }

@@ -161,7 +161,11 @@ const ProtectedLayout: FC<ProtectedLayoutProps> = ({ children, title }) => {
           <Box justifyContent="center" sx={{ flexGrow: 1 }}>
             {title}
           </Box>
-          <Box justifyContent="flex-end">{loading && <RotateIcon />}</Box>
+          {loading && (
+            <Box justifyContent="flex-end">
+              <RotateIcon />
+            </Box>
+          )}
           <Box justifyContent="flex-end">
             <UserProfileMenu />
           </Box>

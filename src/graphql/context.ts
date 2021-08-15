@@ -24,18 +24,20 @@ const apolloServerContext: ContextFunction<{ req: Request }> = async ({ req }) =
     const session = await jwt.getToken({ req: req as any, secret })
 
     if (session === null) throw new Error('no token found cookie or header')
+    if (!session?.email) throw new Error('no user in session')
 
     // Try to retrieve a user with the token
-    if (session?.email) {
-      user = await prisma.user.findUnique({
-        where: {
-          email: session?.email
-        }
-      })
-    }
+    user = await prisma.user.findUnique({
+      where: {
+        email: session?.email
+      }
+    })
+    if (user === null) throw new Error(`user ${session.email} not found in database`)
   } catch (error) {
-    logger.error(error)
+    logger.error(error.message)
   }
+  // eslint-disable-next-line
+  console.groupEnd()
 
   // Add the user to the context
   return { user, prisma }

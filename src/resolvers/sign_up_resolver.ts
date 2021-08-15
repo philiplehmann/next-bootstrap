@@ -14,7 +14,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import VerificationMailer from 'mailers/verification_mailer'
 import { NoUserError, VerificationInvalidTokenError, SignUpError } from './errors'
 import { randomToken } from 'helpers/random_token'
-import { getUserFromContext } from './helpers'
+import { getUserFromContext, queryLogger } from './helpers'
 import { VerifyEmailArgs } from './args'
 import { logger } from 'helpers/logger'
 
@@ -58,6 +58,7 @@ export class SignUpResolver {
     return user
   }
 
+  @queryLogger()
   @Mutation((_returns) => User, {
     nullable: false
   })
@@ -76,6 +77,6 @@ export class SignUpResolver {
       })
     }
     if (!user) throw new NoUserError('no user found')
-    throw new VerificationInvalidTokenError('token is not valid')
+    throw new VerificationInvalidTokenError('token is not valid or the wrong user is logged in')
   }
 }

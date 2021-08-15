@@ -17,7 +17,7 @@
     "ngrok:start": "ngrok start --config=.ngrok.yml --all"
   },
   "dependencies": {
-    "@apollo/client": "^3.3.21",
+    "@apollo/client": "^3.4.7",
     "@datage/rest-api": "^0.0.11",
     "@elastic/elasticsearch": "^7.13.0",
     "@emotion/react": "^11.4.0",

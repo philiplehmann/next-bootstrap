@@ -1,11 +1,7 @@
 import React, { FC } from 'react'
 import { PublicLayout } from 'components/layouts'
-import { passSession } from 'helpers/with_login'
 
 import type { AppWithLoginProps } from 'helpers/with_login'
-import type { GetServerSideProps } from 'next'
-
-export const getServerSideProps: GetServerSideProps = passSession()
 
 const Home: FC<AppWithLoginProps> = () => {
   return (

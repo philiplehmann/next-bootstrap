@@ -6,6 +6,7 @@ dotenv.config({ path: '.env.local' })
 
 import config from 'config'
 import { ApolloServer } from 'apollo-server-express'
+import { ApolloServerPluginUsageReporting } from 'apollo-server-core'
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -38,7 +39,16 @@ const startApolloServer = async () => {
   })
   const apolloServer = new ApolloServer({
     schema,
-    context: apolloServerContext
+    context: apolloServerContext,
+    formatError: (err) => {
+      // Don't give the specific errors to the client.
+      // if (err.message.startsWith('Database Error: ')) {
+      //   return new Error('Internal server error')
+      // }
+      // Otherwise return the original error. The error can also
+      // be manipulated in other ways, as long as it's returned.
+      return err
+    }
   })
 
   await apolloServer.start()
@@ -50,9 +60,14 @@ const startApolloServer = async () => {
   app.use('/graphql', apolloServer.getMiddleware({ path: '/', cors: corsOptions }))
 
   await new Promise((resolve) => app.listen(PORT, () => resolve(null)))
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-console
   console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`)
   return { apolloServer, app }
 }
 
+// catch errors from resolvers and dont let it kill expressjs
+process.on('uncaughtException', (err) => {
+  // eslint-disable-next-line no-console
+  console.error(err)
+})
 startApolloServer()
