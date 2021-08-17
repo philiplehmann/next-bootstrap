@@ -2,13 +2,17 @@ import React, { memo, useState, useCallback, FC, SyntheticEvent } from 'react'
 import { IconButton, MenuItem, Menu } from '@material-ui/core'
 import { AccountCircle as AccountCircleIcon, Logout as LogoutIcon } from '@material-ui/icons'
 import { signOut } from 'next-auth/client'
+import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 
 const menuId = 'primary-search-account-menu'
 
-const UserProfileMenu: FC = memo(({}) => {
+const UserProfileMenu: FC = memo(() => {
+  const router = useRouter()
   const logoutHandler = useCallback(
     async (_event: SyntheticEvent<HTMLElement>) => {
       await signOut()
+      router.push('/')
     },
     [signOut]
   )
@@ -52,9 +56,11 @@ const UserProfileMenu: FC = memo(({}) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={menuCloseHandler}>
-          <AccountCircleIcon /> Profile
-        </MenuItem>
+        <NextLink href="/portal" passHref>
+          <MenuItem onClick={menuCloseHandler}>
+            <AccountCircleIcon /> Profile
+          </MenuItem>
+        </NextLink>
         <MenuItem onClick={logoutHandler}>
           <LogoutIcon /> Logout
         </MenuItem>

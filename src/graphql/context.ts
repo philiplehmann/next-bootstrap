@@ -1,12 +1,13 @@
 import { prisma } from 'config/prisma'
 import { logger } from 'helpers/logger'
 import jwt from 'next-auth/jwt'
+import config from 'config'
 
 import type { ContextFunction } from 'apollo-server-core'
 import type { Request } from 'express'
 import type { User } from 'generated/typegraphql-prisma'
 
-const secret = process.env.NEXTAUTH_SECRET || ''
+const secret = config.nextAuthSecret
 
 const apolloServerContext: ContextFunction<{ req: Request }> = async ({ req }) => {
   // Note: This example uses the `req` argument to access headers,
@@ -23,18 +24,20 @@ const apolloServerContext: ContextFunction<{ req: Request }> = async ({ req }) =
     const session = await jwt.getToken({ req: req as any, secret })
 
     if (session === null) throw new Error('no token found cookie or header')
+    if (!session?.email) throw new Error('no user in session')
 
     // Try to retrieve a user with the token
-    if (session?.email) {
-      user = await prisma.user.findUnique({
-        where: {
-          email: session?.email
-        }
-      })
-    }
+    user = await prisma.user.findUnique({
+      where: {
+        email: session?.email
+      }
+    })
+    if (user === null) throw new Error(`user ${session.email} not found in database`)
   } catch (error) {
-    logger.error(error)
+    logger.error(error.message)
   }
+  // eslint-disable-next-line
+  console.groupEnd()
 
   // Add the user to the context
   return { user, prisma }

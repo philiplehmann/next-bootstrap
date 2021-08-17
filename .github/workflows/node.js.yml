@@ -33,5 +33,6 @@ jobs:
       - run: |
           yarn
           yarn audit
+          yarn prisma:generate
           yarn lint
           yarn build

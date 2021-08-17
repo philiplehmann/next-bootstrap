@@ -2,13 +2,16 @@
   "restartable": "rs",
   "ignore": [
     ".git",
+    ".next",
     "node_modules/",
     "dist/",
     "coverage/"
   ],
   "watch": [
-    "graphql.ts",
     "package.json",
+    "tsconfig.json",
+    "nodemon.json",
+    "prisma/",
     "src/"
   ],
   "execMap": {

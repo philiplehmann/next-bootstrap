@@ -1,7 +1,7 @@
-import { FindFirstUserResolver } from 'generated/typegraphql-prisma'
-import { CreateEncryptedUserResolver, SigninUserResolver } from 'resolvers'
-import { NonEmptyArray } from 'type-graphql'
+import { SessionResolver, SignInResolver, SignUpResolver } from 'resolvers'
+import type { NonEmptyArray } from 'type-graphql'
 
-const resolvers: NonEmptyArray<Function> = [FindFirstUserResolver, CreateEncryptedUserResolver, SigninUserResolver]
+// eslint-disable-next-line @typescript-eslint/ban-types
+const resolvers: NonEmptyArray<Function> = [SessionResolver, SignInResolver, SignUpResolver]
 
 export default resolvers

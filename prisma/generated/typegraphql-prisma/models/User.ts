@@ -34,6 +34,11 @@ export class User {
   })
   email?: string | null;
 
+  @TypeGraphQL.Field(_type => String, {
+    nullable: true
+  })
+  emailVerificationToken?: string | null;
+
   password?: string | null;
 
   @TypeGraphQL.Field(_type => Date, {

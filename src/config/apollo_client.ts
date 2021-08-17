@@ -7,8 +7,9 @@ export const createApolloClient = (token?: string): ApolloClient<NormalizedCache
     serverRuntimeConfig: { graphqlServer: graphqlServerBackend },
     publicRuntimeConfig: { graphqlServer: graphqlServerPublic }
   } = getConfig()
+  const uri = typeof window === undefined ? graphqlServerBackend : graphqlServerPublic
   const httpLink = createHttpLink({
-    uri: typeof window === undefined ? graphqlServerBackend : graphqlServerPublic,
+    uri,
     credentials: 'include' // 'same-origin', 'include'
   })
   const authLink = setContext((_, { headers }) => {
@@ -16,15 +17,15 @@ export const createApolloClient = (token?: string): ApolloClient<NormalizedCache
     return {
       headers: {
         ...headers,
-        authorization: token ? `Bearer ${token}` : ''
+        authorization: `Bearer ${token}`
       }
     }
   })
 
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: token ? authLink.concat(httpLink) : httpLink,
     cache: new InMemoryCache(),
-    ssrMode: true
+    ssrMode: typeof window === 'undefined'
   })
   return client
 }

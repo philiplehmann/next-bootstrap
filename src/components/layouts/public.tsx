@@ -1,6 +1,7 @@
 import React, { memo, useState, useMemo, useCallback, FC, ReactNode } from 'react'
 import {
   AppBar,
+  Alert,
   Container,
   Box,
   Toolbar,
@@ -28,7 +29,8 @@ interface PublicLayoutProps {
 }
 
 const PublicLayout: FC<PublicLayoutProps> = memo(({ children }) => {
-  const [_error, user, loading] = useCurrentUser()
+  const [error, user, loading] = useCurrentUser()
+
   const [mobileDrawer, setMobileDrawer] = useState<boolean>(false)
 
   const toggleMobileDrawerHandler = useCallback(() => {
@@ -108,6 +110,7 @@ const PublicLayout: FC<PublicLayoutProps> = memo(({ children }) => {
           }
         }}
       >
+        {error && <Alert severity="error">{error.message}</Alert>}
         {children}
       </Container>
       <ScrollTop>

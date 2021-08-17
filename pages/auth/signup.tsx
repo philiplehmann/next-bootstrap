@@ -3,10 +3,10 @@ import { Alert, Avatar, Button, TextField, Link, Paper, Grid, Typography } from 
 import { LockOutlined as LockOutlinedIcon } from '@material-ui/icons'
 import { styled } from '@material-ui/system'
 import { PublicLayout } from 'components/layouts'
-import { signOut, signIn } from 'next-auth/client'
+import { signOut, signIn, useSession } from 'next-auth/client'
 import NextLink from 'next/link'
 import { useMutation } from '@apollo/client'
-import SignUpMutation from 'src/queries/sign_up.graphql'
+import SignUpMutation from 'src/queries/sign_up/create_encrypted_user.graphql'
 import { value } from 'helpers/value'
 import { useRouter } from 'next/router'
 
@@ -37,30 +37,36 @@ const SignUpForm = () => {
       const email = value(form, 'email')
       const password = value(form, 'password')
       const passwordConfirm = value(form, 'passwordConfirm')
-      if (password === passwordConfirm) {
-        const result = await signUp({
-          variables: {
-            firstName,
-            lastName,
-            email,
-            password
+      try {
+        if (password === passwordConfirm) {
+          const result = await signUp({
+            variables: {
+              firstName,
+              lastName,
+              email,
+              password
+            }
+          })
+          if (!result.data?.createEncryptedUser?.id) {
+            setError(true)
+            return
           }
-        })
-        if (result.data?.createEncryptedUser?.id) {
-          setError(true)
-          return
-        }
 
-        const result2 = await signIn('credentials', {
-          email,
-          password,
-          redirect: false
-        })
-        if (result2?.ok) {
-          router.push('/portal')
-        } else {
-          router.push('/signin')
+          const result2 = await signIn('credentials', {
+            email,
+            password,
+            redirect: false
+          })
+          if (result2?.ok) {
+            router.push('/auth/verification')
+          } else {
+            router.push('/auth/signin')
+          }
         }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        setError(true)
       }
     }
   }
@@ -153,7 +159,8 @@ const SignUpForm = () => {
   )
 }
 
-const AuthLogin: FC<AppProps> = ({ session }) => {
+const AuthLogin: FC<AppProps> = () => {
+  const [session] = useSession()
   const logoutFromPage = useCallback(
     async (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
