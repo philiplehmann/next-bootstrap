@@ -1,0 +1,17 @@
+mutation SignUp($firstName: String!, $lastName: String!, $email: String!, $password: String!) {
+  createEncryptedUser(data: {
+    firstName: $firstName,
+    lastName: $lastName,
+    email: $email,
+    password: $password
+  }) {
+    id
+    email
+    firstName
+    lastName
+    name
+    image
+    createdAt
+    updatedAt
+  }
+}

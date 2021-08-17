@@ -1,0 +1,7 @@
+mutation SignUp($token: String!) {
+  verifyEmail(data: {
+    token: $token
+  }) {
+    emailVerified
+  }
+}

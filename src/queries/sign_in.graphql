@@ -1,0 +1,15 @@
+query SignIn($email: String!, $password: String!) {
+  signinUser(data: {
+    email: $email,
+    password: $password
+  }) {
+    id
+    email
+    firstName
+    lastName
+    name
+    image
+    createdAt
+    updatedAt
+  }
+}

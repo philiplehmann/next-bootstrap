@@ -1,8 +1,11 @@
 /* global module */
 /* eslint @typescript-eslint/no-var-requires: off */
+require('ts-node/register')
+require('module-alias/register')
+
 require('reflect-metadata')
 const { buildSchemaSync } = require('type-graphql')
-const { resolvers } = require('./prisma/generated/typegraphql-prisma')
+const { default: resolvers } = require('./src/graphql/resolvers')
 const { printSchema } = require('graphql')
 
 const schema = buildSchemaSync({
@@ -42,6 +45,10 @@ module.exports = {
     'no-alert': 'error',
     'no-debugger': 'error',
     'react/prop-types': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { varsIgnorePattern: '^_', argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_', ignoreRestSiblings: true }
+    ],
     'graphql/template-strings': [
       'error',
       {
@@ -62,10 +69,5 @@ module.exports = {
       }
     ]
   },
-  ignorePatterns: [
-    'public/sw.js',
-    'public/workbox-*.js',
-    'public/sw.js.map',
-    'public/workbox-*.js.map'
-  ]
+  ignorePatterns: ['public/sw.js', 'public/workbox-*.js', 'public/sw.js.map', 'public/workbox-*.js.map']
 }

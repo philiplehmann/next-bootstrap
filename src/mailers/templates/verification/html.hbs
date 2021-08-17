@@ -1,0 +1,13 @@
+<div>
+  <h1>
+    Hello {{user.firstName}} {{user.lastName}}
+  </h1>
+  <br />
+  Please verify your account with the following link:
+  <br />
+  <a href="{{baseUrl}}/auth/verification/{{user.emailVerificationToken}}">Verify your E-Mail</a>
+  <br />
+  <br />
+  or you can enter this token:
+  <code>{{user.emailVerificationToken}}</code>
+</div>

@@ -1,22 +1,15 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink,
-  NormalizedCacheObject
-} from '@apollo/client'
+import { ApolloClient, InMemoryCache, createHttpLink, NormalizedCacheObject } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import getConfig from 'next/config'
 
-const {
-  serverRuntimeConfig: { baseUrl }
-} = getConfig()
-
-export const createApolloClient = (
-  token: string | undefined
-): ApolloClient<NormalizedCacheObject> => {
+export const createApolloClient = (token?: string): ApolloClient<NormalizedCacheObject> => {
+  const {
+    serverRuntimeConfig: { graphqlServer: graphqlServerBackend },
+    publicRuntimeConfig: { graphqlServer: graphqlServerPublic }
+  } = getConfig()
+  const uri = typeof window === undefined ? graphqlServerBackend : graphqlServerPublic
   const httpLink = createHttpLink({
-    uri:
-      typeof window === undefined ? `${baseUrl}/api/graphql` : '/api/graphql',
+    uri,
     credentials: 'include' // 'same-origin', 'include'
   })
   const authLink = setContext((_, { headers }) => {
@@ -24,15 +17,15 @@ export const createApolloClient = (
     return {
       headers: {
         ...headers,
-        authorization: token ? `Bearer ${token}` : ''
+        authorization: `Bearer ${token}`
       }
     }
   })
 
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: token ? authLink.concat(httpLink) : httpLink,
     cache: new InMemoryCache(),
-    ssrMode: true
+    ssrMode: typeof window === 'undefined'
   })
   return client
 }

@@ -1,3 +1,5 @@
-nextjs: yarn next dev
+nextjs: yarn dev:nextjs
+graphql: yarn dev:graphql
+maildev: yarn maildev
 postgres: postgres
-elastic: elasticsearch -E "xpack.security.enabled=false" -E "discovery.type=single-node"
+# elastic: elasticsearch -E "xpack.security.enabled=false" -E "discovery.type=single-node"

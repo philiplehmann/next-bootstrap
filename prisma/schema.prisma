@@ -8,9 +8,9 @@ datasource db {
 }
 
 generator typegraphql {
-  provider           = "typegraphql-prisma"
-  output             = "./generated/typegraphql-prisma"
-  emitTranspiledCode = true
+  provider = "typegraphql-prisma"
+  output   = "./generated/typegraphql-prisma"
+  // emitTranspiledCode = true
 }
 
 enum Role {
@@ -45,19 +45,21 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
-  firstName     String?   @db.VarChar(255)
-  lastName      String?   @db.VarChar(255)
-  name          String?   @db.VarChar(255)
-  email         String?   @unique @db.VarChar(255)
-  password      String?   @db.VarChar(255)
-  emailVerified DateTime?
-  image         String?   @db.Text
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  roles         Json      @default("[]") @db.JsonB
+  id                     String    @id @default(uuid()) @db.Uuid
+  firstName              String?   @db.VarChar(255)
+  lastName               String?   @db.VarChar(255)
+  name                   String?   @db.VarChar(255)
+  email                  String?   @unique @db.VarChar(255)
+  emailVerificationToken String?   @db.VarChar(255)
+  /// @TypeGraphQL.omit(output: true)
+  password               String?   @db.VarChar(255)
+  emailVerified          DateTime?
+  image                  String?   @db.Text
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  accounts               Account[]
+  sessions               Session[]
+  roles                  Json      @default("[]") @db.JsonB
 }
 
 model VerificationRequest {

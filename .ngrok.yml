@@ -1,4 +1,4 @@
 tunnels:
   graphql:
     proto: http
-    addr: 5000
+    addr: 5100
