@@ -14,6 +14,7 @@
     "db:migrate": "dotenv-flow -- prisma migrate dev --preview-feature",
     "db:deploy": "dotenv-flow -- prisma migrate deploy --preview-feature",
     "prisma:studio": "dotenv-flow -- prisma studio",
+    "prisma:generate": "dotenv-flow -- prisma generate",
     "ngrok:start": "ngrok start --config=.ngrok.yml --all"
   },
   "dependencies": {
