@@ -10,6 +10,7 @@ import { ApolloServerPluginUsageReporting } from 'apollo-server-core'
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import { logger } from 'helpers/logger'
 
 import { buildSchema } from 'type-graphql'
 // import { applyResolversEnhanceMap } from 'generated/typegraphql-prisma'
@@ -61,13 +62,13 @@ const startApolloServer = async () => {
 
   await new Promise((resolve) => app.listen(PORT, () => resolve(null)))
   // eslint-disable-next-line no-console
-  console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`)
+  logger.log(`🚀 Server ready at http://localhost:${PORT}/graphql`)
   return { apolloServer, app }
 }
 
 // catch errors from resolvers and dont let it kill expressjs
 process.on('uncaughtException', (err) => {
   // eslint-disable-next-line no-console
-  console.error(err)
+  logger.error(err)
 })
 startApolloServer()
