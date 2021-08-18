@@ -38,6 +38,13 @@ cd your-app-name
 # install the right node and postgres version
 asdf install
 
+# install node dependencies
+yarn install
+
+# install prisma client
+yarn prisma:generate
+
+# start foreman with next.js / graphql server / maildev / postgres
 yarn dev
 ```
 
